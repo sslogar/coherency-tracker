@@ -36,5 +36,6 @@ norm_trump = process(trump['text'], stop_words)
 
 tokenized = coherency.tokenizeCorpus(norm_trump)
 m1 = coherency.w2v(tokenized, size=10, window=5, count=1, sample=1e-3)
-print(coherency.returnSimilarWords(m1, ['red', 'ukraine', 'omar', 'democrats', 'great', 'america', 'congress']))
-# print(norm_trump)
+# print(coherency.returnSimilarWords(m1, ['red', 'ukraine', 'omar', 'democrats', 'great', 'america', 'congress']))
+feature_array = coherency.average_word_vectorizer(tokenized, m1, 10)
+print(pd.DataFrame(feature_array))
