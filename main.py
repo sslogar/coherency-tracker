@@ -31,10 +31,10 @@ def process(text, stop_words):
     norm = processText.remove_empty_terms(norm)
     return norm
 
-trump = pd.read_csv('trump.csv', encoding = "ISO-8859-1")
-norm_trump = process(trump['text'], stop_words)
+text = pd.read_csv('text.csv', encoding = "ISO-8859-1")
+norm_text = process(text['text'], stop_words)
 
-tokenized = coherency.tokenizeCorpus(norm_trump)
+tokenized = coherency.tokenizeCorpus(norm_text)
 m1 = coherency.w2v(tokenized, size=10, window=5, count=1, sample=1e-3)
 # print(coherency.returnSimilarWords(m1, ['red', 'ukraine', 'omar', 'democrats', 'great', 'america', 'congress']))
 feature_array = coherency.average_word_vectorizer(tokenized, m1, 10)
