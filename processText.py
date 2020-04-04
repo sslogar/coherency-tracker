@@ -4,6 +4,8 @@ from gensim.models import Word2Vec
 import re
 import string
 from nltk.tokenize import sent_tokenize, word_tokenize
+from gensim.corpora import Dictionary
+from gensim.models.phrases import Phrases, Phraser
 
 def tokenize_sentences(text):
     sub_s = [sent_tokenize(line) for line in text][0]
@@ -43,3 +45,11 @@ def remove_stop_words(term_vec, sw):
 def remove_empty_terms(doc):
     v = [sent for sent in doc if len(sent) > 0]
     return v
+
+def create_dictionary_and_corpus(documents):
+    bigram = Phrases(documents, min_count=20, threshold=20)
+    bigram_model = Phraser(bigram)
+    arr = [bigram_model[d] for d in documents]
+    dic = Dictionary(arr)
+    corpus = [dic.doc2bow(text) for text in arr]
+    return dic, corpus

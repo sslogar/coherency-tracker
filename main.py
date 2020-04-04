@@ -2,6 +2,7 @@ import pandas as pd
 import processText
 import nltk
 import coherency
+import topicModel
 
 stop_words = nltk.corpus.stopwords.words('english')
 
@@ -31,11 +32,11 @@ def process(text, stop_words):
     norm = processText.remove_empty_terms(norm)
     return norm
 
-text = pd.read_csv('text.csv', encoding = "ISO-8859-1")
+text = pd.read_csv('trump.csv', encoding = "ISO-8859-1")
 norm_text = process(text['text'], stop_words)
 
-tokenized = coherency.tokenizeCorpus(norm_text)
-m1 = coherency.w2v(tokenized, size=10, window=5, count=1, sample=1e-3)
-# print(coherency.returnSimilarWords(m1, ['red', 'ukraine', 'omar', 'democrats', 'great', 'america', 'congress']))
-feature_array = coherency.average_word_vectorizer(tokenized, m1, 10)
-print(pd.DataFrame(feature_array))
+word_dict, word_corpus = processText.create_dictionary_and_corpus(norm_text)
+# tokenized = coherency.tokenizeCorpus(norm_text)
+# m1 = coherency.w2v(tokenized, size=10, window=5, count=1, sample=1e-3)
+# feature_array = coherency.average_word_vectorizer(tokenized, m1, 10)
+print(topicModel.getCoherency(word_dict, word_corpus, 10, 'u-mass', varyTopics=True))

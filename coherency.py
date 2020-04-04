@@ -1,5 +1,7 @@
 from gensim.models import Word2Vec
 from nltk.tokenize import WordPunctTokenizer
+from gensim.models.ldamodel import LdaModel
+from gensim.models.coherencemodel import CoherenceModel
 import numpy as np
 
 def tokenizeCorpus(text):
