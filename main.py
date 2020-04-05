@@ -3,6 +3,8 @@ import processText
 import nltk
 import coherency
 import topicModel
+import glob
+import os
 
 stop_words = nltk.corpus.stopwords.words('english')
 
@@ -10,19 +12,8 @@ new_sw = [word.replace("'", "") for word in stop_words if word.find("'") > -1]
 
 stop_words.extend(new_sw)
 
-more_sw = ['im', 'id', 'hed', 'shed', 'hes', 'shes', 'theyre', 'ive', 'one', 'like']
+more_sw = ['im', 'id', 'hed', 'shed', 'hes', 'shes', 'theyre', 'ive', 'one', 'like', 'sic']
 stop_words.extend(more_sw)
-# print(stop_words)
-
-# def extend_sw(sw, arr=[]):
-#     if len(arr) > 0:
-#         sw.extend(arr)
-#     else:
-#         new_sw = new_sw = [word.replace("'", "") for word in sw if word.find("'") > -1]
-#         sw.extend(new_sw)
-#     return sw
-
-# stop_words = extend_sw(stop_words)
 
 def process(text, stop_words):
     sentences = processText.tokenize_sentences(text)
@@ -32,11 +23,30 @@ def process(text, stop_words):
     norm = processText.remove_empty_terms(norm)
     return norm
 
-text = pd.read_csv('trump.csv', encoding = "ISO-8859-1")
-norm_text = process(text['text'], stop_words)
+def get_files(path):
+    all_files = glob.glob(os.path.join(path, "*.csv"))
+    all_df = [pd.read_csv(file, encoding = "ISO-8859-1") for file in all_files]
+    return all_df
 
-word_dict, word_corpus = processText.create_dictionary_and_corpus(norm_text)
+path = r'C:\\Users\\xruns\\Documents\\Python Scripts\\Coherency\\datasets'
+text_dfs = get_files(path)
+
+text_dic = {'trump'+str(text['year'])+str(idx): process(text['text'], stop_words) for (idx, text) in enumerate(text_dfs)}
+
+new_keys = {}
+for (idx, key) in enumerate(text_dic.keys()):
+    year = [int(s) for s in key.split() if s.isdigit()][0]
+    new_keys[key] = ('trump'+ str(idx)+ 'year'+str(year))
+
+for key, value in new_keys.items():
+    print((key, value))
+    text_dic[value] = text_dic.pop(key)
+
+print(text_dic)
+#
+# word_dict, word_corpus = processText.create_dictionary_and_corpus(norm_text)
 # tokenized = coherency.tokenizeCorpus(norm_text)
 # m1 = coherency.w2v(tokenized, size=10, window=5, count=1, sample=1e-3)
+# print(m1.wv.vocab)
 # feature_array = coherency.average_word_vectorizer(tokenized, m1, 10)
-print(topicModel.getCoherency(word_dict, word_corpus, 10, 'u-mass', varyTopics=True))
+# print(topicModel.getCoherency(word_dict, word_corpus, 10, 'u-mass', varyTopics=True))

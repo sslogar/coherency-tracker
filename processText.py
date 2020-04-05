@@ -23,6 +23,8 @@ def replace_chars(s):
     s = s.replace('\x92', "'")
     s = s.replace('\x93', '\"')
     s = s.replace('\x94', '\"')
+    s = s.replace('\x96', ' ')
+    s = s.replace('\x97', ' ')
     return s
 
 def tokenize_words(doc):
