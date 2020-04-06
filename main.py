@@ -28,21 +28,37 @@ def get_files(path):
     all_df = [pd.read_csv(file, encoding = "ISO-8859-1") for file in all_files]
     return all_df
 
-path = r'C:\\Users\\xruns\\Documents\\Python Scripts\\Coherency\\datasets'
+def create_dataset(text_dfs, path):
+    name=os.path.basename(path)
+
+    text_dic = {name+str(text['year'])+str(idx): process(text['text'], stop_words) for (idx, text) in enumerate(text_dfs)}
+    new_keys = {}
+
+    for (idx, key) in enumerate(text_dic.keys()):
+        year = [int(s) for s in key.split() if s.isdigit()][0]
+        new_keys[key] = (name + str(idx)+ 'year'+str(year))
+
+    for key, value in new_keys.items():
+        text_dic[value] = text_dic.pop(key)
+
+    return text_dic
+
+def run_model(d):
+    results = {}
+    for key, value in d.items():
+        word_dict, word_corpus = processText.create_dictionary_and_corpus(value)
+        c = topicModel.getCoherency(word_dict, word_corpus, 10, 'u-mass', varyTopics=True)
+        print((key, c))
+        results[key] = c
+    return results
+
+path = r'C:\\Users\\xruns\\Documents\\Python Scripts\\Coherency\\datasets\\trump'
 text_dfs = get_files(path)
 
-text_dic = {'trump'+str(text['year'])+str(idx): process(text['text'], stop_words) for (idx, text) in enumerate(text_dfs)}
+text_dic = create_dataset(text_dfs, path)
+# print(text_dic)
 
-new_keys = {}
-for (idx, key) in enumerate(text_dic.keys()):
-    year = [int(s) for s in key.split() if s.isdigit()][0]
-    new_keys[key] = ('trump'+ str(idx)+ 'year'+str(year))
-
-for key, value in new_keys.items():
-    print((key, value))
-    text_dic[value] = text_dic.pop(key)
-
-print(text_dic)
+coherencies = run_model(text_dic)
 #
 # word_dict, word_corpus = processText.create_dictionary_and_corpus(norm_text)
 # tokenized = coherency.tokenizeCorpus(norm_text)
