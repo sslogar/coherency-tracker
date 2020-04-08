@@ -5,6 +5,7 @@ import coherency
 import topicModel
 import glob
 import os
+import matplotlib.pyplot as plt
 
 stop_words = nltk.corpus.stopwords.words('english')
 
@@ -52,6 +53,18 @@ def run_model(d):
         results[key] = c
     return results
 
+def create_df(d):
+    data = pd.DataFrame(list(d.items()), columns=['year', 'c'])
+    print(data.year.str[-4:])
+    data.year = data.year.str[-4:]
+    data.year = pd.to_numeric(data.year)
+    data = data.sort_values(by=['year'], ascending=True)
+    return data
+
+def plot_results(d):
+    plt.plot(list(d.year), list(d.c))
+    plt.show()
+
 path = r'C:\\Users\\xruns\\Documents\\Python Scripts\\Coherency\\datasets\\trump'
 text_dfs = get_files(path)
 
@@ -59,6 +72,8 @@ text_dic = create_dataset(text_dfs, path)
 # print(text_dic)
 
 coherencies = run_model(text_dic)
+coherency_df = create_df(coherencies)
+plot_results(coherency_df)
 #
 # word_dict, word_corpus = processText.create_dictionary_and_corpus(norm_text)
 # tokenized = coherency.tokenizeCorpus(norm_text)
